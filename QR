@@ -1,0 +1,76 @@
+Option Explicit
+ 'En vez de usar alguna API para bajar el archivo,
+ ' en su lugar vamos a usar el objeto msxml
+ 
+'--------------------------------------------------------------
+'Creamos cadena de conexión
+Function PonQR() As String
+    Dim RutaG, cadena As String
+    RutaG = ActiveWorkbook.Path & "\" & "elqr.bmp"
+
+    cadena = "https://www.codigos-qr.com/qr/php/qr_img.php?d=Sistema%20de%20gesti%C3%B3n%20de%20grandes%20envases%20%20%20%20%20%20%20%20%20%20%20Propiedad%20de%20Atanor%20S.C.A.%20%20%20%20Envase%20de%201000%20L%20%20%20" + Range("c5") + "%20%20%20%20%20%20%20%20&s=4&e="
+    If Not SaveWebFile(cadena, RutaG) Then
+        MsgBox "Algo ha pasado, pero he fallado. Intentelo de nuevo": Exit Function
+    Else
+        PonQR = RutaG
+    End If
+End Function
+Function PonQR2() As String
+Dim RutaG, cadena As String
+    RutaG = ActiveWorkbook.Path & "\" & "elqr.bmp"
+    cadena = "https://www.codigos-qr.com/qr/php/qr_img.php?d=Sistema%20de%20gesti%C3%B3n%20de%20grandes%20envases%20%20%20%20%20%20%20%20%20%20%20Propiedad%20de%20Atanor%20S.C.A.%20%20%20%20Envase%20de%201000%20L%20%20%20" + Range("c12") + "%20%20%20%20%20%20%20%20&s=4&e="
+    If Not SaveWebFile(cadena, RutaG) Then
+         MsgBox "Algo ha pasado, pero he fallado. Intentelo de nuevo": Exit Function
+    Else
+         PonQR2 = RutaG
+    End If
+End Function
+'--------------------------------------------------------------------
+'Capturamos la imagen y guardamos la imagen
+ Function SaveWebFile(ByVal vWebFile As String, ByVal vLocalFile As String) As Boolean
+Dim oXMLHTTP As Object
+    Dim i As Long
+    Dim vFF As Long
+    Dim oResp() As Byte
+    SaveWebFile = True
+    On Error GoTo ControlErr
+    'podemos en referencias marcar Microsoft XML,
+    'y usar Dim oXMLHTTP as MSXML2.XMLHTTP o creamos el objeto
+    Set oXMLHTTP = CreateObject("MSXML2.XMLHTTP")
+    With oXMLHTTP
+    'Nos conectamos al sitio web
+       .Open "GET", vWebFile, False    'Nos conectamos al sitio web
+       .send    'enviamos la solicitud
+       'Esperamos la peticion para teminar
+       Do While .ReadyState <> 4
+          DoEvents
+       Loop
+        'devuelve el resultado como una matriz de bits (binario).
+       oResp = .responseBody
+    End With
+    'Creamos el archivo y lo guardamos
+    vFF = FreeFile
+    ' Sí existe, primero lo eliminamos
+    If Dir(vLocalFile) <> "" Then Kill vLocalFile
+   ' Instrucción Open para manipular un archivo (E/S)
+   ' Y en su modo Binario
+    Open vLocalFile For Binary As vFF
+   ' Instrucción Put :  Escribe datos desde una variable a un archivo de disco.
+    Put vFF, , oResp
+    Close vFF
+    'limpiamos la memoria
+    Set oXMLHTTP = Nothing
+    DoEvents
+ControlErr:
+    If Err.Number > 0 Then SaveWebFile = False: Resume Next
+End Function
+Function QuitaTildes(strTexto As String) As String
+    strTexto = LCase(strTexto)
+    strTexto = Replace(strTexto, "á", "a")
+    strTexto = Replace(strTexto, "é", "e")
+    strTexto = Replace(strTexto, "í", "i")
+    strTexto = Replace(strTexto, "ó", "o")
+    strTexto = Replace(strTexto, "ú", "u")
+    strTexto = Replace(strTexto, "ü", "u")
+    QuitaTildes = strTexto
+End Function
