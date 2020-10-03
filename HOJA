@@ -1,0 +1,46 @@
+Sub traeQr()
+    Dim cadena As String
+    LimpiaImagenes
+    cadena = PonQR()
+    If Not Dir(cadena) = "" Then
+       Application.ScreenUpdating = False
+       With ActiveSheet.Shapes.AddPicture(cadena, linktofile:=msoFalse, _
+             SaveWithDocument:=msoCTrue, Left:=0, Top:=0, Width:=-1, Height:=-1)
+          .LockAspectRatio = 0
+          .Top = 35
+          .Left = 500
+          .Width = 150
+          .Height = 150
+          .Name = "QR1"
+       End With
+       Application.ScreenUpdating = True
+       DoEvents
+       'eliminamos el archivo bajado
+       Kill cadena
+    End If
+    cadena = PonQR2()
+    If Not Dir(cadena) = "" Then
+       Application.ScreenUpdating = False
+       With ActiveSheet.Shapes.AddPicture(cadena, linktofile:=msoFalse, _
+             SaveWithDocument:=msoCTrue, Left:=0, Top:=0, Width:=-1, Height:=-1)
+          .LockAspectRatio = 0
+          .Top = 260
+          .Left = 500
+          .Width = 150
+          .Height = 150
+          .Name = "QR2"
+       End With
+       Application.ScreenUpdating = True
+       DoEvents
+       'eliminamos el archivo bajado
+       Kill cadena
+    End If
+End Sub
+Sub LimpiaImagenes()
+    'Funcion para eliminar la imagenes generadas solo elimina los QR generados anteriormente
+    On Error Resume Next
+    ActiveSheet.Shapes.Range(Array("QR1")).Select
+    Selection.Delete
+    ActiveSheet.Shapes.Range(Array("QR2")).Select
+    Selection.Delete
+End Sub
